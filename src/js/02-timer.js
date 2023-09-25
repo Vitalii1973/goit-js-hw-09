@@ -1,6 +1,6 @@
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-import * as Notiflix from 'notiflix';
+import Notiflix from 'notiflix';
 
 // Функция для форматирования чисел с добавлением ведущего нуля
 function addLeadingZero(value) {
@@ -15,10 +15,7 @@ function updateTimer() {
   if (endDate <= currentDate) {
     clearInterval(timerId);
     timerId = null;
-    Notiflix.Notify.success('Time is up!');
-    eventStarted = false; // Подія завершилася, можна знову вибирати дату і час
-    dateTimePicker.disabled = false; // Розблоковуємо поле вводу
-    startButton.disabled = true; // Заблоковуємо кнопку
+    Notiflix.Notify.success('Time is up!'); // Используем Notiflix.Notify.success
     return;
   }
 
@@ -74,7 +71,10 @@ const flatpickrInstance = flatpickr(dateTimePicker, {
 });
 
 let timerId = null;
-let eventStarted = false; // Змінна для відстеження статусу події
+let eventStarted = false; // Флаг, що подія не розпочалася
+
+// Додаємо атрибут disabled до кнопки "Start", щоб вона була неактивною з самого початку
+startButton.disabled = true;
 
 // Обработчик нажатия кнопки "Start"
 startButton.addEventListener('click', () => {
@@ -95,7 +95,6 @@ startButton.addEventListener('click', () => {
     timerId = setInterval(updateTimer, 1000);
     updateTimer();
     eventStarted = true; // Подія розпочалася
-    dateTimePicker.disabled = true; // Поле вводу заблоковане
     startButton.disabled = true; // Кнопка заблокована
   }
 });
