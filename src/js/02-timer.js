@@ -16,6 +16,9 @@ function updateTimer() {
     clearInterval(timerId);
     timerId = null;
     Notiflix.Notify.success('Time is up!'); // Используем Notiflix.Notify.success
+    timerRunning = false;
+    dateTimePicker.disabled = false; // Разблокируем поле ввода
+    startButton.disabled = true; // Блокируем кнопку
     return;
   }
 
@@ -60,41 +63,42 @@ const flatpickrInstance = flatpickr(dateTimePicker, {
   onClose(selectedDates) {
     const selectedDate = selectedDates[0];
     const currentDate = new Date();
+    const validDate = selectedDate > currentDate;
 
-    if (selectedDate <= currentDate) {
+    if (validDate) {
+      dateTimePicker.disabled = true; // Заблокируем поле ввода
+      startButton.disabled = false; // Разблокируем кнопку
+    } else {
       Notiflix.Notify.failure('Please choose a date in the future');
       startButton.disabled = true;
-    } else {
-      startButton.disabled = false;
     }
   },
 });
 
 let timerId = null;
-let eventStarted = false; // Флаг, що подія не розпочалася
+let timerRunning = false;
 
-// Додаємо атрибут disabled до кнопки "Start", щоб вона була неактивною з самого початку
+// Добавляем атрибут disabled к кнопке "Start" при инициализации
 startButton.disabled = true;
 
 // Обработчик нажатия кнопки "Start"
 startButton.addEventListener('click', () => {
-  if (eventStarted) {
-    // Подія вже розпочалася, не робимо нічого
+  if (timerRunning) {
+    // Таймер уже запущен, ничего не делаем
     return;
   }
 
   const endDate = flatpickrInstance.selectedDates[0];
   const currentDate = new Date();
+  const validDate = endDate > currentDate;
 
-  if (endDate <= currentDate) {
-    Notiflix.Notify.failure('Please choose a date in the future');
-    return;
-  }
-
-  if (!timerId) {
+  if (validDate) {
     timerId = setInterval(updateTimer, 1000);
     updateTimer();
-    eventStarted = true; // Подія розпочалася
-    startButton.disabled = true; // Кнопка заблокована
+    timerRunning = true;
+    dateTimePicker.disabled = true; // Заблокируем поле ввода
+    startButton.disabled = true; // Заблокируем кнопку
+  } else {
+    Notiflix.Notify.failure('Please choose a date in the future');
   }
 });
